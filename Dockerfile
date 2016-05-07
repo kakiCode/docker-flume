@@ -1,20 +1,23 @@
-FROM debian:jessie
-MAINTAINER Alex Wilson a.wilson@alumni.warwick.ac.uk
+FROM java:openjdk-8-jre
 
 RUN apt-get update && apt-get install -q -y --no-install-recommends wget
 
-RUN mkdir /opt/java
-RUN wget --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" -qO- \
-  https://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-linux-x64.tar.gz \
-  | tar zxvf - -C /opt/java --strip 1
+RUN mkdir -p /opt/flume/conf
+RUN mkdir -p /opt/flume/bin
+RUN mkdir -p /var/log/flume
+RUN mkdir -p /opt/flume/plugins.d/twitter/lib
 
-RUN mkdir /opt/flume
 RUN wget -qO- http://archive.apache.org/dist/flume/1.6.0/apache-flume-1.6.0-bin.tar.gz \
   | tar zxvf - -C /opt/flume --strip 1
 
-ADD start-flume.sh /opt/flume/bin/start-flume
+ADD start-flume.sh /opt/flume/bin/start-flume.sh
+ADD flume.conf /opt/flume/conf/flume.conf
+ADD flume-sources-1.0-SNAPSHOT.jar /opt/flume/plugins.d/twitter/lib/flume-sources-1.0-SNAPSHOT.jar
 
-ENV JAVA_HOME /opt/java
-ENV PATH /opt/flume/bin:/opt/java/bin:$PATH
+ENV PATH /opt/flume/bin:$PATH
 
-CMD [ "start-flume" ]
+ENV FLUME_CONF_FILE /opt/flume/conf/flume.conf
+ENV FLUME_CONF_DIR /opt/flume/conf
+#ENV FLUME_AGENT_NAME <must be provided> run docker run command option
+
+CMD [ "start-flume.sh" ]
