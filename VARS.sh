@@ -1,4 +1,6 @@
 IMG=flume
+KAFKA_CONTAINER=kafka
+KAFKA_CONTAINER_ALIAS=kafka
 CONTAINER=$IMG
 FLUME_AGENT=twitter-agent
 BX_REGISTRY=registry.ng.bluemix.net/mynodeappbue

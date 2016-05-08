@@ -22,7 +22,4 @@ echo "twitter-agent.sources.twitter-src.accessTokenSecret = $accessTokenSecret" 
 docker build -t $BX_IMG .
 docker push $BX_IMG
 
-cf ic run --name $CONTAINER --env FLUME_AGENT_NAME=$FLUME_AGENT --link kafka:kafka --dns 8.8.8.8 --dns 8.8.4.4 -m $BX_CONTAINER_MEMORY $BX_IMG
-
-sleep 6
-cf ic logs $CONTAINER
+./runBluemixDocker.sh
