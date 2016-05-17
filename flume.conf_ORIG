@@ -8,7 +8,7 @@ twitter-agent.sources.twitter-src.consumerKey = 0hH6ntFnAjA7nhpHBhIRA
 twitter-agent.sources.twitter-src.accessToken = 52205623-qF6Cr429crkMDpDyZCWj7bVWMIVutCAobOWyFOvIO
 twitter-agent.sources.twitter-src.maxBatchSize = 10
 twitter-agent.sources.twitter-src.maxBatchDurationMillis = 200
-twitter-agent.sources.twitter-src.keywords = ibm, google, microsoft, facebook, amazon, intel
+twitter-agent.sources.twitter-src.keywords = ibm
 # going to append these lines in real time
 #twitter-agent.sources.twitter-src.consumerSecret = XPTO
 #twitter-agent.sources.twitter-src.accessTokenSecret = XPTO

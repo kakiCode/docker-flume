@@ -3,5 +3,5 @@
 . ./VARS.sh
 
 cf ic stop $CONTAINER
-sleep 6
+sleep 12
 cf ic rm -f $CONTAINER
