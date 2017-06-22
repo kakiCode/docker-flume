@@ -1,8 +1,0 @@
-#!/bin/sh
-
-. ./VARS.sh
-
-cf ic run --name $CONTAINER --env FLUME_AGENT_NAME=$FLUME_AGENT --link $KAFKA_CONTAINER:$KAFKA_CONTAINER_ALIAS -m $BX_CONTAINER_MEMORY $BX_IMG
-
-sleep 12
-cf ic logs $CONTAINER

@@ -14,9 +14,9 @@ twitter-agent.sources.twitter-src.keywords = ibm
 #twitter-agent.sources.twitter-src.accessTokenSecret = XPTO
 
 # file sink to debug purposes
-#twitter-agent.sinks.twitter-file-sink.type = file_roll
-#twitter-agent.sinks.twitter-file-sink.channel = main-channel
-#twitter-agent.sinks.twitter-file-sink.sink.directory = /var/log/flume
+twitter-agent.sinks.twitter-file-sink.type = file_roll
+twitter-agent.sinks.twitter-file-sink.channel = main-channel
+twitter-agent.sinks.twitter-file-sink.sink.directory = /var/log/flume
 
 # kafka sink
 twitter-agent.sinks.twitter-kafka-sink.type = org.apache.flume.sink.kafka.KafkaSink
@@ -31,4 +31,4 @@ twitter-agent.sinks.twitter-kafka-sink.channel = main-channel
 # the agent which ones we want to activate.
 twitter-agent.channels = main-channel
 twitter-agent.sources = twitter-src
-twitter-agent.sinks = twitter-kafka-sink
+twitter-agent.sinks = twitter-file-sink
