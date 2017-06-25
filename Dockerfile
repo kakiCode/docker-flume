@@ -10,7 +10,7 @@ ENV PLUGINS_DIR $FLUME_DIR/plugins.d
 ENV TWITTER_PLUGIN_SRC flume-sources-1.0-SNAPSHOT.jar
 ENV TWITTER_PLUGIN_DIR $PLUGINS_DIR/twitter/lib
 
-ENV FLUME_BUNDLE http://archive.apache.org/dist/flume/1.6.0/apache-flume-1.6.0-bin.tar.gz
+ENV FLUME_BUNDLE http://archive.apache.org/dist/flume/stable/apache-flume-1.7.0-bin.tar.gz
 
 
 RUN apt-get update && apt-get install -q -y --no-install-recommends wget
