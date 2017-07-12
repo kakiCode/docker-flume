@@ -26,5 +26,5 @@ echo "twitter-agent.sources.twitter-src.accessTokenSecret = $accessTokenSecret" 
 docker build -t $IMG .
 
 docker tag $IMG $BX_IMG
-docker run -d --name $CONTAINER --link $KAFKA_CONTAINER:$KAFKA_HOST --env AGENT_NAME=$AGENT -v $base_folder/tmp:/var/log/flume $IMG 
+docker run -d --name $CONTAINER --link $KAFKA_CONTAINER:$KAFKA_HOST --link $INFLUXDB_CONTAINER:$INFLUXDB_HOST --env AGENT_NAME=$AGENT -v $base_folder/tmp:/var/log/flume $IMG 
 docker logs -f $CONTAINER

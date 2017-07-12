@@ -2,13 +2,13 @@
 twitter-agent.channels.main-channel.type = memory
  
 # twiter source
-twitter-agent.sources.twitter-src.type = com.cloudera.flume.source.TwitterSource
+twitter-agent.sources.twitter-src.type = org.aprestos.labs.data.flume.sources.TwitterSource
 twitter-agent.sources.twitter-src.channels = main-channel
 twitter-agent.sources.twitter-src.consumerKey = 0hH6ntFnAjA7nhpHBhIRA
 twitter-agent.sources.twitter-src.accessToken = 52205623-qF6Cr429crkMDpDyZCWj7bVWMIVutCAobOWyFOvIO
 twitter-agent.sources.twitter-src.maxBatchSize = 10
 twitter-agent.sources.twitter-src.maxBatchDurationMillis = 200
-twitter-agent.sources.twitter-src.keywords = amazon
+twitter-agent.sources.twitter-src.keywords = amazon, ibm, tesla, Bango
 
 # going to append these lines in real time
 ###########################################################################################
@@ -24,16 +24,25 @@ twitter-agent.sinks.twitter-file-sink.sink.directory = /var/log/flume
 # kafka sink
 twitter-agent.sinks.twitter-kafka-sink.type = org.apache.flume.sink.kafka.KafkaSink
 twitter-agent.sinks.twitter-kafka-sink.kafka.bootstrap.servers = kafka:9092
-twitter-agent.sinks.twitter-kafka-sink.kafka.topic = twitter
+twitter-agent.sinks.twitter-kafka-sink.kafka.topic = twitter2
 twitter-agent.sinks.twitter-kafka-sink.kafka.flumeBatchSize = 6
 twitter-agent.sinks.twitter-kafka-sink.kafka.producer.acks = 1
 #twitter-agent.sinks.twitter-kafka-sink.kafka.producer.linger.ms = 1
 #twitter-agent.sinks.twitter-kafka-sink.kafka.producer.compression.type = snappy
 twitter-agent.sinks.twitter-kafka-sink.channel = main-channel
 
+# influxdb sink
+twitter-agent.sinks.influxdb-sink.type = org.aprestos.labs.data.flume.sinks.influxdb.InfluxDbSink
+twitter-agent.sinks.influxdb-sink.dbHost = kaki-influxdb
+twitter-agent.sinks.influxdb-sink.dbPort = 8086
+twitter-agent.sinks.influxdb-sink.dbUser = root
+twitter-agent.sinks.influxdb-sink.dbPswd = password
+twitter-agent.sinks.influxdb-sink.dbName = kaki
+twitter-agent.sinks.influxdb-sink.channel = main-channel
+
  
 # Finally, now that we've defined all of our components, tell
 # the agent which ones we want to activate.
 twitter-agent.channels = main-channel
 twitter-agent.sources = twitter-src
-twitter-agent.sinks = twitter-kafka-sink
+twitter-agent.sinks = influxdb-sink

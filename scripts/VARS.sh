@@ -14,3 +14,6 @@ KAFKA_HOST=kafka
 
 ZK_HOST=zookeeper
 ZK_CONTAINER=zookeeper
+
+INFLUXDB_CONTAINER=kaki-influxdb
+INFLUXDB_HOST=kaki-influxdb
