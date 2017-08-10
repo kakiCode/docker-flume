@@ -11,5 +11,5 @@ flume-ng agent \
   -c ${CONF_DIR} \
   -f ${CONF_FILE} \
   -n ${AGENT_NAME} \
-  -Dflume.root.logger=INFO,console
+  -Dflume.root.logger=INFO,console -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=6006
 

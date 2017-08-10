@@ -1,7 +1,7 @@
 IMG=flume
 CONTAINER=$IMG
 
-AGENT=twitter-agent
+AGENT=kaki-agent
 CONF_ORIG=conf/flume.conf_ORIG
 CONF=conf/flume.conf
 
@@ -17,3 +17,5 @@ ZK_CONTAINER=zookeeper
 
 INFLUXDB_CONTAINER=kaki-influxdb
 INFLUXDB_HOST=kaki-influxdb
+
+DEBUG_PORT=6006
