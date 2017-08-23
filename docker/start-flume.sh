@@ -7,9 +7,10 @@ CONF_DIR=${CONF_DIR:-/opt/flume/conf}
 
 echo "Starting flume agent : ${AGENT_NAME}"
 
-flume-ng agent \
-  -c ${CONF_DIR} \
-  -f ${CONF_FILE} \
-  -n ${AGENT_NAME} \
-  -Dflume.root.logger=INFO,console -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=6006
+debug_switch=""
+if [ ! -z "$DEBUG_PORT" ]; then
+	debug_switch="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$DEBUG_PORT"
+fi
+
+flume-ng agent -c ${CONF_DIR} -f ${CONF_FILE} -n ${AGENT_NAME} -Dflume.root.logger=INFO,console $debug_switch
 
