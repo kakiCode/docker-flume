@@ -1,6 +1,9 @@
 # docker-flume
 ## Apache Flume docker image
 
+- can be pulled from:
+  - ```kakicode/flume```
+  - ```registry.ng.bluemix.net/mynodeappbue/flume```
 - hostname: flume
 - expects to resolve :
   - zookeeper on "zookeeper" hostname
