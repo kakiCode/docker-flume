@@ -1,21 +1,26 @@
-IMG=flume
+NAME=flume
+IMG=$NAME
+IMG_VERSION=latest
 CONTAINER=$IMG
+HOST=$NAME
 
 AGENT=kaki-agent
 CONF_ORIG=conf/flume.conf_ORIG
 CONF=conf/flume.conf
 
 BX_REGISTRY=registry.ng.bluemix.net/mynodeappbue
-BX_IMG=$BX_REGISTRY/$IMG
+BLUEMIX_IMG=$BX_REGISTRY/$IMG
 BX_CONTAINER_MEMORY=128
+
+DOCKER_HUB_IMG=kakicode/$NAME
 
 KAFKA_CONTAINER=kafka
 KAFKA_HOST=kafka
 
-ZK_HOST=zookeeper
 ZK_CONTAINER=zookeeper
+ZK_HOST=zookeeper
 
-INFLUXDB_CONTAINER=kaki-influxdb
-INFLUXDB_HOST=kaki-influxdb
+INFLUXDB_CONTAINER=influxdb
+INFLUXDB_HOST=influxdb
 
 DEBUG_PORT=6006
