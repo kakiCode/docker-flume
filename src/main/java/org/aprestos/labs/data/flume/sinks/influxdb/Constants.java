@@ -9,5 +9,5 @@ public interface Constants {
 		, DB_NAME = "dbName"
 		, BATCH_SIZE = "batchSize";
 	
-	static final int DEFAULT_BATCH_SIZE = 32;
+	static final int DEFAULT_BATCH_SIZE = 10;
 }

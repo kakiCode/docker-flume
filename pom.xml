@@ -26,7 +26,21 @@
 		<javaxWsRsVersion>2.1-m09</javaxWsRsVersion>
 		<googleGsonVersion>2.8.0</googleGsonVersion>
 	</properties>
-
+	<distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>org.twitter4j</id>
+            <name>twitter4j.org Repository</name>
+            <uniqueVersion>false</uniqueVersion>
+            <url>file:${user.home}/maven2/</url>
+        </snapshotRepository>
+    </distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -81,12 +95,27 @@
 		</dependency>
 
 		<!-- For the Twitter API -->
-		<dependency>
-			<groupId>org.twitter4j</groupId>
-			<artifactId>twitter4j-stream</artifactId>
-			<version>3.0.5</version>
-		</dependency>
-
+ 		<!-- <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-async</artifactId>
+            <version>4.0.3</version>
+        </dependency> -->
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>3.0.6</version>
+        </dependency>
+    <!--     <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-media-support</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+ -->
 		<!-- flume Dependencies -->
 		<dependency>
 			<groupId>org.apache.flume</groupId>
@@ -169,7 +198,4 @@
 		</dependency>
 	</dependencies>
 
-	<!-- <repositories> <repository> <id>cloudera</id> <url>https://repository.cloudera.com/artifactory/cloudera-repos</url> 
-		<releases> <enabled>true</enabled> </releases> <snapshots> <enabled>false</enabled> 
-		</snapshots> </repository> </repositories> -->
 </project>

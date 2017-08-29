@@ -21,13 +21,11 @@ import com.google.common.base.Throwables;
 
 public class InfluxDbSink extends AbstractSink implements Configurable {
 
-
 	private static final Logger logger = LoggerFactory.getLogger(InfluxDbSink.class);
-
 	private SinkCounter counter;
 	private InfluxDB db;
 	private int batchSize = Constants.DEFAULT_BATCH_SIZE;
-
+	private long processedEvents = 0;
 
 	@Override
 	public Status process() throws EventDeliveryException {
@@ -37,15 +35,14 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 		Channel channel = getChannel();
 		Transaction transaction = null;
 		Event event = null;
-
+		byte[] eventBody = null;
+	
 		try {
-			long processedEvents = 0;
-
 			transaction = channel.getTransaction();
 			transaction.begin();
-			byte[] eventBody = null;
 			
-			while( null != ( event = channel.take() ) && null != (eventBody = event.getBody()) && 0 < eventBody.length && processedEvents < batchSize){
+			while( null != ( event = channel.take() ) && null != (eventBody = event.getBody()) 
+					&& 0 < eventBody.length && processedEvents < batchSize){
 				PointDto point = PointUtils.fromBytes(eventBody);
 				db.write(PointUtils.pointDto2Point(point));
 				processedEvents++;
@@ -55,15 +52,16 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 				result = Status.BACKOFF;
 				counter.incrementBatchEmptyCount();
 			}
-			else 
+			else {
 				counter.incrementBatchCompleteCount();
-				
-			logger.info("process | processed events: {}", processedEvents);
+				logger.info("process | processed events: {}", processedEvents);
+				processedEvents = 0;
+			}
 			transaction.commit();
 
 		} catch (Exception ex) {
-			String errorMsg = "Failed to write events to db";
-			logger.error(errorMsg, ex);
+			String errorMsg = "Failed to write events to db, eventBody: {}";
+			logger.error(errorMsg, null == eventBody ? "": new String(eventBody) , ex);
 			result = Status.BACKOFF;
 			if (transaction != null) {
 				try {
@@ -127,8 +125,8 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 			db.setDatabase(dbName);
 			db.setRetentionPolicy("autogen");
 
-			// Flush every 100 Points, at least every 100ms
-			db.enableBatch(100, 100, TimeUnit.MILLISECONDS);
+			// Flush every Points, at least every 100ms
+			db.enableBatch(this.batchSize, 1000, TimeUnit.MILLISECONDS);
 			
 			counter = new SinkCounter(getName());
 		}

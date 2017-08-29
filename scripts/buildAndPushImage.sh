@@ -5,9 +5,17 @@ echo "going to build image "
 scripts_folder=$(dirname $(readlink -f $0))
 base_folder=$(dirname $scripts_folder)
 docker_folder=$base_folder/docker
+target_folder=$base_folder/target
+docker_lib_folder=$docker_folder/lib
+libjar=flume-extensions-1.0-SNAPSHOT.jar
 
 . $scripts_folder/VARS.sh
 . $scripts_folder/include.sh
+
+_pwd=`pwd`
+cd $base_folder
+mvn clean package
+cp $target_folder/$libjar $docker_lib_folder/
 
 consumerSecret=$(getSecret consumerSecret)
 accessTokenSecret=$(getSecret accessTokenSecret)
@@ -27,7 +35,6 @@ echo "kaki-agent.sources.tickers-src.apikey = $apikey" >> $docker_folder/$CONF
 
 echo "going to build image $IMG and push it to docker hub and bluemix repository..."
 
-_pwd=`pwd`
 cd $docker_folder
 
 docker rmi $IMG:$IMG_VERSION

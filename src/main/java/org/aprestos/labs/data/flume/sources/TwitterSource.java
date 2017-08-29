@@ -18,6 +18,7 @@
 
 package org.aprestos.labs.data.flume.sources;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,14 +34,11 @@ import org.aprestos.labs.data.common.influxdb.PointUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import twitter4j.FilterQuery;
-import twitter4j.StallWarning;
-import twitter4j.Status;
-import twitter4j.StatusDeletionNotice;
-import twitter4j.StatusListener;
-import twitter4j.TwitterStream;
-import twitter4j.TwitterStreamFactory;
+import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+
+
+
 
 /**
  * A Flume Source, which pulls data from Twitter's streaming API. Currently,
@@ -102,6 +100,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			cb.setIncludeEntitiesEnabled(true);
 
 			twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+
 		} catch (Exception e) {
 			logger.error("configure", e);
 		}
@@ -160,10 +159,12 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			}
 
 			public void onException(Exception ex) {
+				logger.error("onStatus", ex);
 			}
 
 			public void onStallWarning(StallWarning warning) {
 			}
+
 		};
 
 		logger.debug("Setting up Twitter sample stream using consumer key {} and" + " access token {}",
@@ -177,8 +178,9 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			twitterStream.sample();
 		} else {
 			logger.debug("Starting up Twitter filtering...");
-
-			FilterQuery query = new FilterQuery().track(keywords);
+			FilterQuery query = new FilterQuery();
+			query.track(keywords);
+			//query.language(new String[]{"en"});
 			twitterStream.filter(query);
 		}
 		super.start();
@@ -198,7 +200,8 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		
 		PointDto result = new PointDto();
 		result.setMeasurement(POINT_MESAUREMENT);
-		result.addField("text", status.getText());
+		
+		result.addField("text", new String(status.getText().getBytes(Charset.defaultCharset()), Charset.forName("ASCII")));
 		if(null != status.getGeoLocation()){
 			result.addTag("latitude", Double.toString(status.getGeoLocation().getLatitude()));
 			result.addTag("longitude", Double.toString(status.getGeoLocation().getLongitude()));
