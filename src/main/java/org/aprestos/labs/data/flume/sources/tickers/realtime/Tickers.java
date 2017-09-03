@@ -94,15 +94,19 @@ public class Tickers extends AbstractSource implements EventDrivenSource, Config
 		}
 			
 		if (null == (apikey = context.getString(Config.API_KEY))) 
-			throw new RuntimeException("no apikey provided");
+			throw new IllegalArgumentException(String.format("!!! must provide % config !!!", Config.API_KEY));
 		
-		String t = null;
-		if (null == (t = context.getString(Config.TICKERS))) 
-			throw new RuntimeException("no apikey provided");
+		String t =  System.getenv(Config.ENV_VAR_TICKERS);
+		if ( null == t || t.isEmpty() || 0 == t.trim().length() ) 
+			throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_TICKERS));
 		
 		tickers = t.split(",");
 		for(int i=0; i < tickers.length; i++)
 			tickers[i] = tickers[i].trim();
+		
+		if(0 == tickers.length)
+			throw new IllegalArgumentException(String.format("!!! must provide comma delimited % environment variable !!!", Config.ENV_VAR_TICKERS));
+	
 		
 		logger.debug("[OUT]");
 	}

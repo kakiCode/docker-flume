@@ -5,6 +5,7 @@ public interface Config {
 	static final String 
 		API_KEY = "apikey" 
 		, TICKERS = "tickers"
+		, ENV_VAR_TICKERS = "TICKERS"
 		, INTERVAL = "interval"
 		, DELAY_IN_MILLIS = "delayInMillis" 
 		
