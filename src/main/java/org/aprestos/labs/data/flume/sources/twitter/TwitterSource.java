@@ -112,10 +112,25 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			public void onStatus(Status status) {
 				// The EventBuilder is used to build an event using the headers
 				// and the raw JSON of a tweet
-				logger.debug(status.getUser().getScreenName() + ": " + status.getText());
+
 				try {
+					String tag = null;
+					for( String keyword: keywords )
+						if(status.getText().toLowerCase().contains(keyword.toLowerCase())) {
+							tag = keyword;
+							break;
+						}
+					
+					if(null == tag) {
+						logger.debug("no keyword in text");
+						return;
+					}
+					
+					logger.debug(status.getUser().getScreenName() + ": " + status.getText());
 					headers.put("timestamp", String.valueOf(status.getCreatedAt().getTime()));
 					PointDto point = status2PointDto(status);
+					point.addTag("keyword", tag);
+							
 					Event event = EventBuilder.withBody(PointUtils.toBytes(point), headers);
 					channel.processEvent(event);
 				} catch (Exception e) {
