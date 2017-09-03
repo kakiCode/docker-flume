@@ -83,15 +83,21 @@ public class Tickers extends AbstractSource implements EventDrivenSource, Config
 	@Override
 	public void configure(Context context) {
 		logger.debug("[IN]");
-		if (0 == (delayInMillis = context.getInteger(Config.DELAY_IN_MILLIS))) {
-			delayInMillis = Config.DEFAULT_DELAY;
-			logger.warn("no delayInMillis specified using default {}", Config.DEFAULT_DELAY);
-		}
 		
-		if (null == (interval = context.getString(Config.INTERVAL))) {
-			interval = Config.DEFAULT_INTERVAL;
-			logger.warn("no interval specified using default {}", Config.DEFAULT_INTERVAL);
+		String queryDelay =  System.getenv(Config.ENV_VAR_QUERY_DELAY);
+		if ( null == queryDelay || queryDelay.isEmpty() || 0 == queryDelay.trim().length() ) 
+			throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_QUERY_DELAY));
+		
+		try {
+			delayInMillis = Integer.parseInt(queryDelay);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(String.format("!!! must provide valid % environment variable !!!", Config.ENV_VAR_QUERY_DELAY), e);
 		}
+
+		
+		if (null == (interval = System.getenv(Config.ENV_VAR_DATA_INTERVAL))) 
+			throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_DATA_INTERVAL));
+		
 			
 		if (null == (apikey = context.getString(Config.API_KEY))) 
 			throw new IllegalArgumentException(String.format("!!! must provide % config !!!", Config.API_KEY));

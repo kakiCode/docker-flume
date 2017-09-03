@@ -6,6 +6,8 @@ public interface Config {
 		API_KEY = "apikey" 
 		, TICKERS = "tickers"
 		, ENV_VAR_TICKERS = "TICKERS"
+		, ENV_VAR_QUERY_DELAY = "QUERY_DELAY"
+		, ENV_VAR_DATA_INTERVAL = "DATA_INTERVAL"
 		, INTERVAL = "interval"
 		, DELAY_IN_MILLIS = "delayInMillis" 
 		
@@ -17,9 +19,6 @@ public interface Config {
 		, FUNCTION = "TIME_SERIES_INTRADAY"
 		, MEASUREMENT_TICKER = "ticker"
 		;
-	
-	static final String DEFAULT_INTERVAL = "5min"; 
-	static final int DEFAULT_DELAY =  5 * 60 * 1000;// 5 minutes
 	
 	//https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=1min&apikey=demo
 }

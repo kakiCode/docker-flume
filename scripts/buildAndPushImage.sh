@@ -29,9 +29,9 @@ fi
 
 echo "...setting up secrets in flume conf..."
 cp $docker_folder/$CONF_ORIG $docker_folder/$CONF
-echo "kaki-agent.sources.tweets-src.consumerSecret = $consumerSecret" >> $docker_folder/$CONF
-echo "kaki-agent.sources.tweets-src.accessTokenSecret = $accessTokenSecret" >> $docker_folder/$CONF
-echo "kaki-agent.sources.tickers-src.apikey = $apikey" >> $docker_folder/$CONF
+echo "kaki-agent.sources.tweets.consumerSecret = $consumerSecret" >> $docker_folder/$CONF
+echo "kaki-agent.sources.tweets.accessTokenSecret = $accessTokenSecret" >> $docker_folder/$CONF
+echo "kaki-agent.sources.tickers.apikey = $apikey" >> $docker_folder/$CONF
 
 echo "going to build image $IMG and push it to docker hub and bluemix repository..."
 
