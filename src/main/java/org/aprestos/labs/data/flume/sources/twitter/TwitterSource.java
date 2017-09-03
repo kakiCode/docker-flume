@@ -43,10 +43,8 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
-
 public class TwitterSource extends AbstractSource implements EventDrivenSource, Configurable {
 
-	
 	private static final Logger logger = LoggerFactory.getLogger(TwitterSource.class);
 	private String[] keywords;
 
@@ -54,9 +52,9 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 	private TwitterStream twitterStream;
 
 	/**
-	 * The initialization method for the Source. The context contains all the
-	 * Flume configuration info, and can be used to retrieve any configuration
-	 * values necessary to set up the Source.
+	 * The initialization method for the Source. The context contains all the Flume
+	 * configuration info, and can be used to retrieve any configuration values
+	 * necessary to set up the Source.
 	 */
 	@Override
 	public void configure(Context context) {
@@ -66,22 +64,26 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			String consumerSecret = context.getString(Config.CONSUMER_SECRET_KEY);
 			String accessToken = context.getString(Config.ACCESS_TOKEN_KEY);
 			String accessTokenSecret = context.getString(Config.ACCESS_TOKEN_SECRET_KEY);
-	
-			String keywordString =  System.getenv(Config.ENV_VAR_KEYWORDS);
-			if( null == keywordString || keywordString.isEmpty() || 0 == keywordString.trim().length() )
-				throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_KEYWORDS));
-			
+
+			String keywordString = System.getenv(Config.ENV_VAR_KEYWORDS);
+			if (null == keywordString || keywordString.isEmpty() || 0 == keywordString.trim().length())
+				throw new IllegalArgumentException(
+						String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_KEYWORDS));
+
 			keywords = keywordString.split(",");
 			for (int i = 0; i < keywords.length; i++) {
 				keywords[i] = keywords[i].trim();
 			}
-			
-			if(0 == keywords.length)
-				throw new IllegalArgumentException(String.format("!!! must provide comma delimited % environment variable !!!", Config.ENV_VAR_KEYWORDS));
-			
-			logger.debug("Setting up Twitter filtered stream using consumer key {} and" + " access token {}, filtered on keywords {}",
+
+			if (0 == keywords.length)
+				throw new IllegalArgumentException(String.format(
+						"!!! must provide comma delimited % environment variable !!!", Config.ENV_VAR_KEYWORDS));
+
+			logger.debug(
+					"Setting up Twitter filtered stream using consumer key {} and"
+							+ " access token {}, filtered on keywords {}",
 					new String[] { consumerKey, accessToken, keywordString });
-			
+
 			ConfigurationBuilder cb = new ConfigurationBuilder();
 			cb.setOAuthConsumerKey(consumerKey);
 			cb.setOAuthConsumerSecret(consumerSecret);
@@ -112,25 +114,24 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			public void onStatus(Status status) {
 				// The EventBuilder is used to build an event using the headers
 				// and the raw JSON of a tweet
-
 				try {
 					String tag = null;
-					for( String keyword: keywords )
-						if(status.getText().toLowerCase().contains(keyword.toLowerCase())) {
+					for (String keyword : keywords)
+						if (status.getText().toLowerCase().contains(keyword.toLowerCase())) {
 							tag = keyword;
 							break;
 						}
-					
-					if(null == tag) {
+
+					if (null == tag) {
 						logger.debug("no keyword in text");
 						return;
 					}
-					
+
 					logger.debug(status.getUser().getScreenName() + ": " + status.getText());
 					headers.put("timestamp", String.valueOf(status.getCreatedAt().getTime()));
 					PointDto point = status2PointDto(status);
 					point.addTag("keyword", tag);
-							
+
 					Event event = EventBuilder.withBody(PointUtils.toBytes(point), headers);
 					channel.processEvent(event);
 				} catch (Exception e) {
@@ -161,7 +162,6 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 
 		};
 
-		
 		// Set up the stream's listener (defined above),
 		twitterStream.addListener(listener);
 
@@ -170,7 +170,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		FilterQuery query = new FilterQuery();
 		query.track(keywords);
 		twitterStream.filter(query);
-		
+
 		super.start();
 	}
 
@@ -183,25 +183,26 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		twitterStream.shutdown();
 		super.stop();
 	}
-	
-	private PointDto status2PointDto(Status status){
-		
+
+	private PointDto status2PointDto(Status status) {
+
 		PointDto result = new PointDto();
 		result.setMeasurement(Config.POINT_MESAUREMENT);
 		// converting text to ascii
-		result.addField("text", new String(status.getText().getBytes(Charset.defaultCharset()), Charset.forName("ASCII")));
-		if(null != status.getGeoLocation()){
+		result.addField("text",
+				new String(status.getText().getBytes(Charset.defaultCharset()), Charset.forName("ASCII")));
+		if (null != status.getGeoLocation()) {
 			result.addTag("latitude", Double.toString(status.getGeoLocation().getLatitude()));
 			result.addTag("longitude", Double.toString(status.getGeoLocation().getLongitude()));
 		}
 
-		if(null !=status.getPlace() && null != status.getPlace().getCountry())
+		if (null != status.getPlace() && null != status.getPlace().getCountry())
 			result.addTag("country", status.getPlace().getCountry());
-		
+
 		result.setTimestamp(status.getCreatedAt().getTime());
 
 		return result;
-		
+
 	}
-	
+
 }
