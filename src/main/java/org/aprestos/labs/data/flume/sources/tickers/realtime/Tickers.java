@@ -93,7 +93,6 @@ public class Tickers extends AbstractSource implements EventDrivenSource, Config
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException(String.format("!!! must provide valid % environment variable !!!", Config.ENV_VAR_QUERY_DELAY), e);
 		}
-
 		
 		if (null == (interval = System.getenv(Config.ENV_VAR_DATA_INTERVAL))) 
 			throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.ENV_VAR_DATA_INTERVAL));

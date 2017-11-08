@@ -18,6 +18,8 @@ public interface Config {
 		, URI = "https://www.alphavantage.co/query"
 		, FUNCTION = "TIME_SERIES_INTRADAY"
 		, MEASUREMENT_TICKER = "ticker"
+		
+		, QUANDL_APIKEY = "xQ9Sq7ybYvkuhLnyC1JF"
 		;
 	
 	//https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=1min&apikey=demo

@@ -29,7 +29,7 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 
 	@Override
 	public Status process() throws EventDeliveryException {
-		logger.trace("process<IN>");
+		logger.info("process<IN>");
 		
 		Status result = Status.READY;
 		Channel channel = getChannel();
@@ -76,27 +76,27 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 			if (transaction != null) 
 				transaction.close();
 		}
-		logger.trace("process<OUT>");
+		logger.info("process<OUT>");
 		return result;
 	}
 
 	@Override
 	public synchronized void start() {
-		logger.trace("start<IN>");
+		logger.info("start<IN>");
 		counter.start();
 		super.start();
-		logger.trace("start<OUT>");
+		logger.info("start<OUT>");
 	}
 
 	@Override
 	public synchronized void stop() {
-		logger.trace("stop<IN>");
+		logger.info("stop<IN>");
 		if(null != db)
 			db.close();
 		counter.stop();
 		logger.info("stopped. Metrics: {}", getName(), counter);
 		super.stop();
-		logger.trace("stop<OUT>");
+		logger.info("stop<OUT>");
 	}
 
 	@Override

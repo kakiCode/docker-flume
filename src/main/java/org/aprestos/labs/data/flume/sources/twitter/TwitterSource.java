@@ -131,6 +131,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 					headers.put("timestamp", String.valueOf(status.getCreatedAt().getTime()));
 					PointDto point = status2PointDto(status);
 					point.addTag("keyword", tag);
+					logger.info("processed tweet: {}", point.toString());
 
 					Event event = EventBuilder.withBody(PointUtils.toBytes(point), headers);
 					channel.processEvent(event);
