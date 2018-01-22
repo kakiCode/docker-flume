@@ -38,6 +38,7 @@ import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
 import org.aprestos.labs.data.common.influxdb.PointDto;
 import org.aprestos.labs.data.common.influxdb.PointUtils;
+import org.aprestos.labs.data.flume.sources.tickers.realtime.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,12 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 	private static final Logger logger = LoggerFactory.getLogger(RandomPercentage.class);
 	
 	private ScheduledExecutorService service;
-	private int delayInMillis;
+	
+	protected String[] configurationKeys = new String[]{"measurement"};
+	protected String[] dynamicConfigurationKeys = new String[]{"delayInMillis"};
+	protected final Map<String,String> configuration = new HashMap<String,String>();
+	
+	
 	
 	/**
 	 * The initialization method for the Source. The context contains all the
@@ -60,12 +66,22 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 	public void configure(Context context) {
 		logger.debug("[IN]");
 		
-		String interval =  System.getenv(Config.DELAY_IN_MILLIS);
-		if ( null == interval || interval.isEmpty() || 0 == interval.trim().length() ) 
-			throw new IllegalArgumentException(String.format("!!! must provide % environment variable !!!", Config.DELAY_IN_MILLIS));
+		for(String ck: configurationKeys) {
+			String val = null;
+			if( null == ( val = context.getString(ck) ) )
+				throw new IllegalArgumentException(String.format("!!! must provide % config !!!", ck));
+			else 
+				configuration.put(ck, val);
+		}
 		
-		delayInMillis = Integer.parseInt(interval);
-		
+		for(String dck: dynamicConfigurationKeys) {
+			String val = null;
+			if( null == ( val = System.getenv(dck) ) )
+				throw new IllegalArgumentException(String.format("!!! must provide % dynamic config !!!", dck));
+			else 
+				configuration.put(dck, val);
+		}
+			
 		logger.debug("[OUT]");
 	}
 
@@ -93,9 +109,16 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 			// The channel is the piece of Flume that sits between the Source and Sink, and is used to process events.
 			final ChannelProcessor channel = getChannelProcessor();
 			
+			long delayInMillis = 0;
+			try {
+				delayInMillis = Long.parseLong(configuration.get("delayInMillis"));
+			} catch (Exception e) {
+				throw new IllegalArgumentException(String.format(" wrong config %s: %s", "delayInMillis", configuration.get("delayInMillis")));
+			}
+			
 			service.scheduleAtFixedRate(
 					new Runner(channel)
-					, this.delayInMillis, this.delayInMillis, TimeUnit.MILLISECONDS);
+					, delayInMillis, delayInMillis, TimeUnit.MILLISECONDS);
 
 			super.start();
 		} catch (Exception e) {
