@@ -51,10 +51,64 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 	
 	private ScheduledExecutorService service;
 	
-	protected String[] configurationKeys = new String[]{"measurement"};
-	protected String[] dynamicConfigurationKeys = new String[]{"delayInMillis"};
 	protected final Map<String,String> configuration = new HashMap<String,String>();
 	
+	protected String[] getConfigurationKeys() {
+		return new String[] {"measurement"};
+	}
+	
+	protected String[] getDynamicConfigurationKeys() {
+		return new String[] {"delayInMillis"};
+	}
+	
+	protected String getConfiguration (String key) {
+		return configuration.get(key);
+	}
+	
+	protected static PointDto entry2PointDto(String measurement, long ts, Map<String, String> tags, Map<String, Double> fields) {
+		logger.debug("entry2PointDto [IN]");
+		PointDto result = null;
+		try {
+			result = new PointDto();
+			result.setMeasurement(measurement);
+			for(Map.Entry<String, String> tag: tags.entrySet())
+				result.addTag(tag.getKey(), tag.getValue());
+			
+			for(Map.Entry<String, Double> field: fields.entrySet())
+				result.addField(field.getKey(), field.getValue());
+
+			result.setTimestamp(ts);
+			return result;
+		} 
+		finally {
+			logger.debug("entry2PointDto [OUT]");
+			
+		}
+	}
+	
+	protected static Event createPointEvent(final double value){
+		logger.info("createPoint [IN]");
+		Event result = null;
+		try {
+			final Map<String, String> headers = new HashMap<String, String>();
+			long ts = new Date().getTime();
+			Map<String,String> tags = new HashMap<String,String>();
+			tags.put("name", "dummy_percentage");
+			Map<String,Double> values = new HashMap<String,Double>();
+			values.put("value", value);
+			headers.put("timestamp", Long.toString(ts));
+			PointDto point = entry2PointDto(getConfiguration("measurement"), ts, tags, values);
+			logger.info(String.format("processing point: %s", point.toString()));
+			result = EventBuilder.withBody(PointUtils.toBytes(point), headers);
+			return result;
+
+		} catch (Exception e) {
+			logger.error("problem when trying to createPoints", e);
+		}
+		finally {
+			logger.info("createPoint [OUT]");
+		}
+	}
 	
 	
 	/**
@@ -66,7 +120,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 	public void configure(Context context) {
 		logger.debug("[IN]");
 		
-		for(String ck: configurationKeys) {
+		for(String ck: getConfigurationKeys()) {
 			String val = null;
 			if( null == ( val = context.getString(ck) ) )
 				throw new IllegalArgumentException(String.format("!!! must provide % config !!!", ck));
@@ -74,7 +128,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 				configuration.put(ck, val);
 		}
 		
-		for(String dck: dynamicConfigurationKeys) {
+		for(String dck: getDynamicConfigurationKeys()) {
 			String val = null;
 			if( null == ( val = System.getenv(dck) ) )
 				throw new IllegalArgumentException(String.format("!!! must provide % dynamic config !!!", dck));
@@ -147,7 +201,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 		public void run() {
 			logger.info("run [IN]");
 			try {
-				createPoint(random.nextDouble() * 100);
+				channel.processEvent(createPointEvent(random.nextDouble() * 100));
 			} catch (Exception e) {
 				logger.error("oops", e);
 			}
@@ -157,48 +211,9 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 			
 		}
 
-		private void createPoint(final double value){
-			logger.info("createPoint [IN]");
-			try {
-				final Map<String, String> headers = new HashMap<String, String>();
-				long ts = new Date().getTime();
-				Map<String,String> tags = new HashMap<String,String>();
-				tags.put("name", "dummy_percentage");
-				Map<String,Double> values = new HashMap<String,Double>();
-				values.put("value", value);
-				headers.put("timestamp", Long.toString(ts));
-				PointDto point = entry2PointDto(Config.MEASUREMENT, ts, tags, values);
-				logger.info(String.format("processing point: %s", point.toString()));
-				Event event = EventBuilder.withBody(PointUtils.toBytes(point), headers);
-				channel.processEvent(event);
-
-			} catch (Exception e) {
-				logger.error("problem when trying to createPoints", e);
-			}
-			finally {
-				logger.info("createPoint [OUT]");
-			}
-		}
 		
-		private PointDto entry2PointDto(String measurement, long ts, Map<String, String> tags, Map<String, Double> fields) {
-			logger.debug("entry2PointDto [IN]");
-			try {
-				PointDto result = new PointDto();
-				result.setMeasurement(measurement);
-				for(Map.Entry<String, String> tag: tags.entrySet())
-					result.addTag(tag.getKey(), tag.getValue());
-				
-				for(Map.Entry<String, Double> field: fields.entrySet())
-					result.addField(field.getKey(), field.getValue());
-
-				result.setTimestamp(ts);
-
-				return result;
-			} 
-			finally {
-				logger.debug("entry2PointDto [OUT]");
-			}
-		}
+		
+		
 		
 	}
 	
