@@ -17,32 +17,18 @@ cd $base_folder
 mvn clean package
 cp $target_folder/$libjar $docker_lib_folder/
 
-consumerSecret=$(getSecret consumerSecret)
-accessTokenSecret=$(getSecret accessTokenSecret)
-apikey=$(getSecret apikey)
 
-if [ -z $consumerSecret ] || [ -z $accessTokenSecret ] || [ -z $apikey ] 
-then
-	echo "!!! secrets missing !!! ...leaving."
-	return 1
-fi
-
-echo "...setting up secrets in flume conf..."
+echo "...setting up flume conf..."
 cp $docker_folder/$CONF_ORIG $docker_folder/$CONF
-echo "kaki-agent.sources.tweets.consumerSecret = $consumerSecret" >> $docker_folder/$CONF
-echo "kaki-agent.sources.tweets.accessTokenSecret = $accessTokenSecret" >> $docker_folder/$CONF
-echo "kaki-agent.sources.tickers.apikey = $apikey" >> $docker_folder/$CONF
 
-echo "going to build image $IMG and push it to docker hub and bluemix repository..."
+echo "going to build image $IMG and push it to docker hub..."
 
 cd $docker_folder
 
 docker rmi $IMG:$IMG_VERSION
-docker build -t $IMG $docker_folder
+docker build -t $IMG .
 docker tag $IMG $DOCKER_HUB_IMG
-docker tag $IMG $BLUEMIX_IMG
 docker push $DOCKER_HUB_IMG
-docker push $BLUEMIX_IMG
 
 cd $_pwd
 

@@ -74,8 +74,9 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
       if (null == val)
         throw new IllegalArgumentException(
-            String.format("configure|!!! must provide % configuration, either in config or in env var !!!", k));
+            String.format("configure| !!! must provide % configuration, either in config or in env var !!!", k));
 
+      logger.info(String.format("configure| found configuration %s: %s", k, val));
       configuration.put(k, val);
     }
 
@@ -87,7 +88,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
    */
   @Override
   public void start() {
-    logger.info("start|IN");
+    logger.debug("start|IN");
     int nProcessors = Runtime.getRuntime().availableProcessors();
     if (1 < nProcessors)
       nProcessors /= 2;
@@ -117,9 +118,9 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
       super.start();
     } catch (Exception e) {
-      logger.error("start|problem starting", e);
+      logger.error("start| problem starting", e);
     } finally {
-      logger.info("start|OUT");
+      logger.debug("start|OUT");
     }
   }
 
@@ -144,13 +145,15 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
     @Override
     public void run() {
-      logger.info("Runner|run|IN");
+      logger.debug("Runner|run|IN");
       try {
-        channel.processEvent(createPointEvent(random.nextDouble() * 100));
+        double p = random.nextDouble() * 100;
+        channel.processEvent(createPointEvent(p));
+        logger.debug(String.format("Runner|run| new point: %s", Double.toString(p)));
       } catch (Exception e) {
-        logger.error("Runner|run|oops", e);
+        logger.error("Runner|run| oops", e);
       } finally {
-        logger.info("Runner|run|OUT");
+        logger.debug("Runner|run|OUT");
       }
 
     }
@@ -169,7 +172,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
   }
 
   protected static Event createPointEvent(final double value) {
-    logger.info("createPointEvent|IN");
+    logger.debug("createPointEvent|IN");
     Event result = null;
     try {
       final Map<String, String> headers = new HashMap<String, String>();
@@ -180,12 +183,12 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
       values.put("value", value);
       headers.put("timestamp", Long.toString(ts));
       PointDto point = new PointDto(ts, getConfiguration(Config.measurement), tags, values);
-      logger.info(String.format("createPointEvent|processing point: %s", point.toString()));
+      logger.debug(String.format("createPointEvent|processing point: %s", point.toString()));
       result = EventBuilder.withBody(PointUtils.toBytes(point), headers);
     } catch (Exception e) {
       logger.error("createPointEvent|problem when trying to createPoints", e);
     } finally {
-      logger.info("createPointEvent|OUT");
+      logger.debug("createPointEvent|OUT");
     }
     return result;
   }
