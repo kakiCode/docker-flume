@@ -4,23 +4,18 @@ IMG_VERSION=latest
 CONTAINER=$IMG
 HOST=$NAME
 
-AGENT=kaki-agent
-CONF_ORIG=conf/flume.conf_ORIG
+AGENT=kaki
+CONF_ORIG=conf/flume_simple.conf
 CONF=conf/flume.conf
 
-BX_REGISTRY=registry.ng.bluemix.net/mynodeappbue
-BLUEMIX_IMG=$BX_REGISTRY/$IMG
-BX_CONTAINER_MEMORY=128
 
 DOCKER_HUB_IMG=kakicode/$NAME
 
-KAFKA_CONTAINER=kafka
-KAFKA_HOST=kafka
+#KAFKA_CONTAINER=kafka
+#KAFKA_HOST=kafka
+#ZK_CONTAINER=zookeeper
+#ZK_HOST=zookeeper
+#INFLUXDB_CONTAINER=influxdb
+#INFLUXDB_HOST=influxdb
 
-ZK_CONTAINER=zookeeper
-ZK_HOST=zookeeper
-
-INFLUXDB_CONTAINER=influxdb
-INFLUXDB_HOST=influxdb
-
-DEBUG_PORT=6006
+#DEBUG_PORT=6006

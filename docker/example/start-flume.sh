@@ -4,6 +4,7 @@ CONF_DIR=${CONF_DIR:-/opt/flume/conf}
 
 [[ -z "${CONF_FILE}"  ]] && { echo "CONF_FILE required";  exit 1; }
 [[ -z "${AGENT_NAME}" ]] && { echo "AGENT_NAME required"; exit 1; }
+
 #[[ -z "${KEYWORDS}" ]] && { echo "KEYWORDS required"; exit 1; }
 #[[ -z "${TICKERS}" ]] && { echo "TICKERS required"; exit 1; }
 

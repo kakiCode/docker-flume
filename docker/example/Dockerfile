@@ -10,7 +10,7 @@ ENV PLUGINS_DIR $FLUME_DIR/plugins.d
 ENV PLUGIN_SRC flume-extensions-1.0-SNAPSHOT.jar
 ENV PLUGIN_DIR $PLUGINS_DIR/custom/lib
 
-ENV FLUME_BUNDLE http://archive.apache.org/dist/flume/stable/apache-flume-1.7.0-bin.tar.gz
+ENV FLUME_BUNDLE http://archive.apache.org/dist/flume/stable/apache-flume-1.8.0-bin.tar.gz
 
 
 RUN apt-get update && apt-get install -q -y --no-install-recommends wget

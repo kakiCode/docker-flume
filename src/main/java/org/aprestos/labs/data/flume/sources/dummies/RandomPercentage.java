@@ -70,8 +70,9 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
       if (null == val)
         throw new IllegalArgumentException(
-            String.format("configure|!!! must provide % configuration, either in config or in env var !!!", k));
+            String.format("configure| !!! must provide % configuration, either in config or in env var !!!", k));
 
+      logger.info(String.format("configure| found configuration %s: %s", k, val));
       configuration.put(k, val);
     }
 
@@ -83,7 +84,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
    */
   @Override
   public void start() {
-    logger.info("start|IN");
+    logger.debug("start|IN");
     int nProcessors = Runtime.getRuntime().availableProcessors();
     if (1 < nProcessors)
       nProcessors /= 2;
@@ -113,9 +114,9 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
       super.start();
     } catch (Exception e) {
-      logger.error("start|problem starting", e);
+      logger.error("start| problem starting", e);
     } finally {
-      logger.info("start|OUT");
+      logger.debug("start|OUT");
     }
   }
 
@@ -152,13 +153,13 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
     @Override
     public void run() {
-      logger.info("Runner|run|IN");
+      logger.debug("Runner|run|IN");
       try {
         channel.processEvent(PointUtils.createPointEvent(random.nextDouble() * 100, getConfiguration(Config.MEASUREMENT)));
       } catch (Exception e) {
-        logger.error("Runner|run|oops", e);
+        logger.error("Runner|run| oops", e);
       } finally {
-        logger.info("Runner|run|OUT");
+        logger.debug("Runner|run|OUT");
       }
 
     }
