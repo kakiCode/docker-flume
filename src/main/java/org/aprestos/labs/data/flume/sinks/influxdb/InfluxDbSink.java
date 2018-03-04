@@ -40,7 +40,6 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 		try {
 			transaction = channel.getTransaction();
 			transaction.begin();
-			
 			while( null != ( event = channel.take() ) && null != (eventBody = event.getBody()) 
 					&& 0 < eventBody.length && processedEvents < batchSize){
 				PointDto point = PointUtils.fromBytes(eventBody);
@@ -119,8 +118,12 @@ public class InfluxDbSink extends AbstractSink implements Configurable {
 				this.batchSize = batchSize;
 
 			db = InfluxDBFactory.connect(String.format("http://%s:%s", host, port ), user, pswd);
-			if(!db.databaseExists(dbName))
+			if(!db.databaseExists(dbName)) {
 				db.createDatabase(dbName);
+				logger.info(String.format("created database %s", dbName));
+			}
+			else
+				logger.info(String.format("database %s exists!", dbName));
 			
 			db.setDatabase(dbName);
 			db.setRetentionPolicy("autogen");

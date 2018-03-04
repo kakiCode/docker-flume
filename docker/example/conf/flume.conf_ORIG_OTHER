@@ -1,0 +1,114 @@
+############ ------------------------------ channels
+
+###### raw tweets channel
+kaki-agent.channels.channel-tweets.type = memory
+#	Maximum total bytes of memory allowed as a sum of all events in this channel
+kaki-agent.channels.channel-tweets.byteCapacity = 0
+# Defines the percent of buffer between byteCapacity and the estimated total size of all events in the channel, to account for data in headers
+kaki-agent.channels.channel-tweets.byteCapacityBufferPercentage = 20
+#	The maximum number of events stored in the channel
+kaki-agent.channels.channel-tweets.capacity = 2048
+#	The maximum number of events the channel will take from a source or give to a sink per transaction
+kaki-agent.channels.channel-tweets.transactionCapacity = 128
+
+###### streams-processed tweets channels
+kaki-agent.channels.channel-tweets-s.type = memory
+kaki-agent.channels.channel-tweets-s.byteCapacity = 0
+kaki-agent.channels.channel-tweets-s.byteCapacityBufferPercentage = 20
+kaki-agent.channels.channel-tweets-s.capacity = 2048
+kaki-agent.channels.channel-tweets-s.transactionCapacity = 128
+
+### tickers channel
+kaki-agent.channels.channel-tickers.type = memory
+kaki-agent.channels.channel-tickers.byteCapacity = 0
+kaki-agent.channels.channel-tickers.byteCapacityBufferPercentage = 20
+kaki-agent.channels.channel-tickers.capacity = 2048
+kaki-agent.channels.channel-tickers.transactionCapacity = 128
+
+###### r-processed tickers channel
+kaki-agent.channels.channel-tickers-r.type = memory
+kaki-agent.channels.channel-tickers-r.byteCapacity = 0
+kaki-agent.channels.channel-tickers-r.byteCapacityBufferPercentage = 20
+kaki-agent.channels.channel-tickers-r.capacity = 2048
+kaki-agent.channels.channel-tickers-r.transactionCapacity = 128
+
+
+############ ------------------------------ sources
+
+### raw tweets source
+kaki-agent.sources.tweets.type = org.aprestos.labs.data.flume.sources.twitter.TwitterSource
+kaki-agent.sources.tweets.channels = channel-tweets
+kaki-agent.sources.tweets.consumerKey = 0hH6ntFnAjA7nhpHBhIRA
+kaki-agent.sources.tweets.accessToken = 52205623-qF6Cr429crkMDpDyZCWj7bVWMIVutCAobOWyFOvIO
+# going to append these lines in real time
+###########################################################################################
+#kaki-agent.sources.tweets.consumerSecret = XPTO <= added by a script on deploy
+#kaki-agent.sources.tweets.accessTokenSecret = XPTO <= added by a script on deploy
+###########################################################################################
+
+### source of processed tweets from streams
+kaki-agent.sources.tweets-s.type = org.apache.flume.source.kafka.KafkaSource
+kaki-agent.sources.tweets-s.channels = channel-tweets-s
+kaki-agent.sources.tweets-s.kafka.bootstrap.servers = kafka:9092
+kaki-agent.sources.tweets-s.kafka.topics = tweets-s
+
+### tickers source
+kaki-agent.sources.tickers.type = org.aprestos.labs.data.flume.sources.tickers.realtime.Tickers
+kaki-agent.sources.tickers.channels = channel-tickers
+############################################################################################
+#kaki-agent.sources.tickers.apikey = XPTO <= added by a script on deploy
+###########################################################################################
+
+### source of processed tickers from r
+kaki-agent.sources.tickers-r.type = org.apache.flume.source.kafka.KafkaSource
+kaki-agent.sources.tickers-r.channels = channel-tickers-r
+kaki-agent.sources.tickers-r.kafka.bootstrap.servers = kafka:9092
+kaki-agent.sources.tickers-r.kafka.topics = tickers-r
+
+############ ------------------------------ sinks
+
+### raw tweets kafka sink
+kaki-agent.sinks.tweets.type = org.apache.flume.sink.kafka.KafkaSink
+kaki-agent.sinks.tweets.kafka.bootstrap.servers = kafka:9092
+kaki-agent.sinks.tweets.kafka.topic = tweets
+kaki-agent.sinks.tweets.channel = channel-tweets
+kaki-agent.sinks.tweets.kafka.producer.compression.type = gzip
+
+### processed tweets influxdb sink
+kaki-agent.sinks.tweets-s.type = org.aprestos.labs.data.flume.sinks.influxdb.InfluxDbSink
+kaki-agent.sinks.tweets-s.dbHost = influxdb
+kaki-agent.sinks.tweets-s.dbPort = 8086
+kaki-agent.sinks.tweets-s.dbUser = root
+kaki-agent.sinks.tweets-s.dbPswd = password
+kaki-agent.sinks.tweets-s.dbName = kaki
+kaki-agent.sinks.tweets-s.channel = channel-tweets-s
+
+### raw tickers kafka sink
+kaki-agent.sinks.tickers.type = org.apache.flume.sink.kafka.KafkaSink
+kaki-agent.sinks.tickers.kafka.bootstrap.servers = kafka:9092
+kaki-agent.sinks.tickers.kafka.topic = tickers
+kaki-agent.sinks.tickers.channel = channel-tickers
+kaki-agent.sinks.tickers.kafka.producer.compression.type = gzip
+
+### processed tickers influxdb sink
+kaki-agent.sinks.tickers-r.type = org.aprestos.labs.data.flume.sinks.influxdb.InfluxDbSink
+kaki-agent.sinks.tickers-r.dbHost = influxdb
+kaki-agent.sinks.tickers-r.dbPort = 8086
+kaki-agent.sinks.tickers-r.dbUser = root
+kaki-agent.sinks.tickers-r.dbPswd = password
+kaki-agent.sinks.tickers-r.dbName = kaki
+kaki-agent.sinks.tickers-r.channel = channel-tickers-r
+
+
+kaki-agent.channels = channel-tweets channel-tweets-s channel-tickers channel-tickers-r
+kaki-agent.sources = tweets tweets-s tickers tickers-r
+kaki-agent.sinks = tweets tweets-s tickers tickers-r
+
+
+### ----------------------------------------------------------------------------
+
+# file sink to debug purposes
+#kaki-agent.sinks.twitter-file-sink.type = file_roll
+#kaki-agent.sinks.twitter-file-sink.channel = channel-processed
+#kaki-agent.sinks.twitter-file-sink.sink.directory = /var/log/flume
+

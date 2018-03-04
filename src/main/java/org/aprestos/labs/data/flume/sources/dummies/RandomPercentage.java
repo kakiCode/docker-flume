@@ -13,7 +13,6 @@
 
 package org.aprestos.labs.data.flume.sources.dummies;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +25,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.flume.Context;
-import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
 import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.conf.Configurable;
-import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
-import org.aprestos.labs.data.common.influxdb.PointDto;
 import org.aprestos.labs.data.common.influxdb.PointUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,10 +103,10 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
       long delayInMillis = 0;
       try {
-        delayInMillis = Long.parseLong(getConfiguration(Config.delayInMillis));
+        delayInMillis = Long.parseLong(getConfiguration(Config.DELAY_IN_MILLIS));
       } catch (Exception e) {
-        throw new IllegalArgumentException(String.format("start|wrong config %s: %s", Config.delayInMillis.toString(),
-            getConfiguration(Config.delayInMillis)));
+        throw new IllegalArgumentException(String.format("start|wrong config %s: %s", Config.DELAY_IN_MILLIS.toString(),
+            getConfiguration(Config.DELAY_IN_MILLIS)));
       }
 
       service.scheduleAtFixedRate(new Runner(channel), delayInMillis, delayInMillis, TimeUnit.MILLISECONDS);
@@ -123,6 +119,18 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
     }
   }
 
+  /**
+   * Stops the Source's event processing and shuts down the executor service.
+   */
+  @Override
+  public void stop() {
+    logger.debug("stop|IN");
+    this.service.shutdown();
+    super.stop();
+    logger.debug("stop|OUT");
+  }
+  
+  
   /**
    * dummy source of data implementation
    * 
@@ -146,7 +154,7 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
     public void run() {
       logger.info("Runner|run|IN");
       try {
-        channel.processEvent(createPointEvent(random.nextDouble() * 100));
+        channel.processEvent(PointUtils.createPointEvent(random.nextDouble() * 100, getConfiguration(Config.MEASUREMENT)));
       } catch (Exception e) {
         logger.error("Runner|run|oops", e);
       } finally {
@@ -157,37 +165,6 @@ public class RandomPercentage extends AbstractSource implements EventDrivenSourc
 
   }
 
-  /**
-   * Stops the Source's event processing and shuts down the executor service.
-   */
-  @Override
-  public void stop() {
-    logger.debug("stop|IN");
-    this.service.shutdown();
-    super.stop();
-    logger.debug("stop|OUT");
-  }
 
-  protected static Event createPointEvent(final double value) {
-    logger.info("createPointEvent|IN");
-    Event result = null;
-    try {
-      final Map<String, String> headers = new HashMap<String, String>();
-      long ts = new Date().getTime();
-      Map<String, String> tags = new HashMap<String, String>();
-      tags.put("name", "dummy_percentage");
-      Map<String, Object> values = new HashMap<String, Object>();
-      values.put("value", value);
-      headers.put("timestamp", Long.toString(ts));
-      PointDto point = new PointDto(ts, getConfiguration(Config.measurement), tags, values);
-      logger.info(String.format("createPointEvent|processing point: %s", point.toString()));
-      result = EventBuilder.withBody(PointUtils.toBytes(point), headers);
-    } catch (Exception e) {
-      logger.error("createPointEvent|problem when trying to createPoints", e);
-    } finally {
-      logger.info("createPointEvent|OUT");
-    }
-    return result;
-  }
 
 }
